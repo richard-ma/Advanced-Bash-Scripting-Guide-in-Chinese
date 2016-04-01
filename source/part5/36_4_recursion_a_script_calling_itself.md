@@ -41,7 +41,7 @@ exit 0
 #!/bin/bash
 # pb.sh: phone book
 
-# 用于权限管理的脚本，由Rick Boivie编写。
+# 由Rick Boivie编写，已授权本书使用。
 # ABS作者稍有修改
 
 MINARGS=1     # 需要至少一个参数
@@ -91,7 +91,7 @@ Sam Roe         956 E. 8th St., New York, NY 10009          (212) 444-5678
 ```
 #!/bin/bash
 # usrmnt.sh, 由Anthony Richardson编写
-# 在ABS Guide中用于权限管理
+# 已授权本书使用。
 
 # usage:       usrmnt.sh
 # description: 想使用挂载设备操作的用户，在/etc/sudoers文件中必须属于MNTUSERS组。
