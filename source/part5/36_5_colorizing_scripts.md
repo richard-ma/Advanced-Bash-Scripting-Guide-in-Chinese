@@ -67,8 +67,8 @@ case "$person" in
 # 添加Smith和Zane的相关信息
 
           * )
-   # Default option.	  
-   # Empty input (hitting RETURN) fits here, too.
+   # 默认操作	  
+   # 用回车清空输入
    echo
    echo "Not yet in database."
   ;;
@@ -82,11 +82,11 @@ echo
 exit 0
 ```
 
-## Example 36-14. 画一个盒子
+## Example 36-14. 画一个矩形
 
 ```
 #!/bin/bash
-# Draw-box.sh: 用ASCII字符画一个盒子
+# Draw-box.sh: 用ASCII字符画一个矩形
 
 # 由Stefano Palmeri编写并经过细微的修改。
 # 修改建议是由Jim Angstadt提出的。
@@ -95,35 +95,29 @@ exit 0
 ######################################################################
 ###  draw_box 函数文档 ###
 
-# "draw_box"函数能让用户在终端绘制一个盒子。
+# "draw_box"函数能让用户在终端绘制一个矩形。
 #
 #  用法: draw_box ROW COLUMN HEIGHT WIDTH [COLOR] 
-#  ROW和COLUMN代表你要画盒子的左上角        
-#+ of the upper left angle of the box you're going to draw.
-#  ROW and COLUMN must be greater than 0
-#+ and less than current terminal dimension.
-#  HEIGHT is the number of rows of the box, and must be > 0. 
-#  HEIGHT + ROW must be <= than current terminal height. 
-#  WIDTH is the number of columns of the box and must be > 0.
-#  WIDTH + COLUMN must be <= than current terminal width.
+#  ROW和COLUMN代表你要画矩形的左上角坐标，必须大于0且小于当前终端的最大限制。
+#  HEIGHT表示矩形的高度，必须大于0。
+#  HEIGHT + ROW必须小于当前终端限制。
+#  WIDTH表示矩形的宽度，必须大于0。
+#  WIDTH + COLUMN必须小于当前终端限制。
 #
-# E.g.: If your terminal dimension is 20x80,
-#  draw_box 2 3 10 45 is good
-#  draw_box 2 3 19 45 has bad HEIGHT value (19+2 > 20)
-#  draw_box 2 3 18 78 has bad WIDTH value (78+3 > 80)
+#  例如：如果终端是20x80大小的
+#  draw_box 2 3 10 45 是可以的
+#  draw_box 2 3 19 45 高度值超标(19+2 > 20)
+#  draw_box 2 3 18 78 宽度值超标(78+3 > 80)
 #
-#  COLOR is the color of the box frame.
-#  This is the 5th argument and is optional.
-#  0=black 1=red 2=green 3=tan 4=blue 5=purple 6=cyan 7=white.
-#  If you pass the function bad arguments,
-#+ it will just exit with code 65,
-#+ and no messages will be printed on stderr.
+#  COLOR代表矩形边框颜色。
+#  它是第五个参数，并且是可选的（没有可以不写）
+#  0=黑色 1=红色 2=绿色 3=棕黄色 4=蓝色 5=紫色 6=青色 7=白色
+#  如果参数有错误，程序会自动退出并返回代码65,并不会输出任何信息到标准错误输出上。
 #
-#  Clear the terminal before you start to draw a box.
-#  The clear command is not contained within the function.
-#  This allows the user to draw multiple boxes, even overlapping ones.
+#  在绘制矩形之前请清空终端。这个程序并没有自动执行这一步。
+#  这可以让用户绘制多个矩形。
 
-###  end of draw_box function doc  ### 
+###  draw_box 函数文档结束 ### 
 ######################################################################
 
 draw_box(){
@@ -138,23 +132,22 @@ E_BADARGS=65
 #=============#
 
 
-if [ $# -lt "$MINARGS" ]; then          # If args are less than 4, exit.
+if [ $# -lt "$MINARGS" ]; then          # 如果少于4个参数，直接退出
     exit $E_BADARGS
 fi
 
-# Looking for non digit chars in arguments.
-# Probably it could be done better (exercise for the reader?).
+# 检查参数中是否有非数字字符，如果有可能意味着参数有错误
 if echo $@ | tr -d [:blank:] | tr -d [:digit:] | grep . &> /dev/null; then
    exit $E_BADARGS
 fi
 
-BOX_HEIGHT=`expr $3 - 1`   #  -1 correction needed because angle char "+"
-BOX_WIDTH=`expr $4 - 1`    #+ is a part of both box height and width.
-T_ROWS=`tput lines`        #  Define current terminal dimension 
-T_COLS=`tput cols`         #+ in rows and columns.
+BOX_HEIGHT=`expr $3 - 1`   #  对输入的矩形宽和高进行-1操作
+BOX_WIDTH=`expr $4 - 1`    #
+T_ROWS=`tput lines`        #  确定当前终端的行和列最大值
+T_COLS=`tput cols`         #
          
-if [ $1 -lt 1 ] || [ $1 -gt $T_ROWS ]; then    #  Start checking if arguments
-   exit $E_BADARGS                             #+ are correct.
+if [ $1 -lt 1 ] || [ $1 -gt $T_ROWS ]; then    #  开始检查参数是否有错误
+   exit $E_BADARGS
 fi
 if [ $2 -lt 1 ] || [ $2 -gt $T_COLS ]; then
    exit $E_BADARGS
@@ -167,18 +160,18 @@ if [ `expr $2 + $BOX_WIDTH + 1` -gt $T_COLS ]; then
 fi
 if [ $3 -lt 1 ] || [ $4 -lt 1 ]; then
    exit $E_BADARGS
-fi                                 # End checking arguments.
+fi                                 # 检查参数结束
 
-plot_char(){                       # Function within a function.
+plot_char(){                       # 一个定义在其他函数内的函数（译注：证明shell脚本可以进行函数嵌套）
    echo -e "\E[${1};${2}H"$3
 }
 
-echo -ne "\E[3${5}m"               # Set box frame color, if defined.
+echo -ne "\E[3${5}m"               # 设置矩形边框颜色
 
 # start drawing the box
 
-count=1                                         #  Draw vertical lines using
-for (( r=$1; count<=$BOX_HEIGHT; r++)); do      #+ plot_char function.
+count=1                                         #  使用plot_char函数绘制竖线
+for (( r=$1; count<=$BOX_HEIGHT; r++)); do
   plot_char $r $2 $VERT
   let count=count+1
 done 
@@ -190,8 +183,8 @@ for (( r=$1; count<=$BOX_HEIGHT; r++)); do
   let count=count+1
 done 
 
-count=1                                        #  Draw horizontal lines using
-for (( c=$2; count<=$BOX_WIDTH; c++)); do      #+ plot_char function.
+count=1                                        #  使用plot_char函数绘制横线
+for (( c=$2; count<=$BOX_WIDTH; c++)); do
   plot_char $1 $c $HORZ
   let count=count+1
 done 
@@ -203,33 +196,33 @@ for (( c=$2; count<=$BOX_WIDTH; c++)); do
   let count=count+1
 done 
 
-plot_char $1 $2 $CORNER_CHAR                   # Draw box angles.
+plot_char $1 $2 $CORNER_CHAR                   # 绘制矩形的拐角
 plot_char $1 `expr $2 + $BOX_WIDTH` $CORNER_CHAR
 plot_char `expr $1 + $BOX_HEIGHT` $2 $CORNER_CHAR
 plot_char `expr $1 + $BOX_HEIGHT` `expr $2 + $BOX_WIDTH` $CORNER_CHAR
 
-echo -ne "\E[0m"             #  Restore old colors.
+echo -ne "\E[0m"             #  恢复终端原有颜色
 
-P_ROWS=`expr $T_ROWS - 1`    #  Put the prompt at bottom of the terminal.
+P_ROWS=`expr $T_ROWS - 1`    #  绘制后将提示符现实在下一行
 
 echo -e "\E[${P_ROWS};1H"
 }      
 
 
-# Now, let's try drawing a box.
-clear                       # Clear the terminal.
+# 测试真正绘制一个矩形
+clear                       # 清空终端屏幕
 R=2      # Row
 C=3      # Column
 H=10     # Height
 W=45     # Width 
 col=1    # Color (red)
-draw_box $R $C $H $W $col   # Draw the box.
+draw_box $R $C $H $W $col   # 绘制矩形
 
 exit 0
 
-# Exercise:
+# 练习：
 # --------
-# Add the option of printing text within the drawn box.
+# 在绘制的矩形中添加字符输出
 ```
 
 The simplest, and perhaps most useful ANSI escape sequence is bold text, \033[1m ... \033[0m. The \033 represents an escape, the "[1" turns on the bold attribute, while the "[0" switches it off. The "m" terminates each term of the escape sequence.
