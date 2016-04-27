@@ -2,7 +2,7 @@
 
 ANSI转译序列可以设置屏幕属性以达到显示粗体字或改变前景和背景色等效果。DOS批处理文件通过ANSI转译编码来实现彩色输出，Bash也可以做到。
 
-## Example 36-13. A "colorized" address database
+## Example 36-13. 有色彩的地址薄
 
 ```
 #!/bin/bash
@@ -225,38 +225,35 @@ exit 0
 # 在绘制的矩形中添加字符输出
 ```
 
-The simplest, and perhaps most useful ANSI escape sequence is bold text, \033[1m ... \033[0m. The \033 represents an escape, the "[1" turns on the bold attribute, while the "[0" switches it off. The "m" terminates each term of the escape sequence.
+最简单也是最有用的ANSI转义符可能就是加粗了，即\033[1m ... \033[0m。\033表示转义符开始，[1表示开始加粗，[0表示结束加粗，m表示转义符结束。
 
 ```
 bash$ echo -e "\033[1mThis is bold text.\033[0m"
 ```
-	      
 
-A similar escape sequence switches on the underline attribute (on an rxvt and an aterm).
+另一个相似的转义符是下划线。
 
 ```
 bash$ echo -e "\033[4mThis is underlined text.\033[0m"
 ```
 	      
 
-Note	
+小贴士
 
-With an echo, the -e option enables the escape sequences.
+在echo命令使用-e参数，表示可以使用转义符序列。
 
-Other escape sequences change the text and/or background color.
+其他的转义符可以改变文本或者背景色。
 
 ```
 bash$ echo -e '\E[34;47mThis prints in blue.'; tput sgr0
 
-
 bash$ echo -e '\E[33;44m'"yellow text on blue background"; tput sgr0
-
 
 bash$ echo -e '\E[1;33;44m'"BOLD yellow text on blue background"; tput sgr0
 ```
 	      
 
-Note	
+小贴士
 
 It's usually advisable to set the bold attribute for light-colored foreground text.
 
